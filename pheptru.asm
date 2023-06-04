@@ -146,21 +146,36 @@ ORG 100H
     ;CX = CX - 1, NEU CX > 0 LAP LAI QUA TRINH TREN
     LOOP XULITOANTU2  
     
-    ;tinh toan var1 = var1 + var2
+   ;tinh toan var1 = var1 - var2
     clc 
     mov AX, [0 + offset var2]
-    add [0 + offset VAR1], AX 
+    sub [0 + offset VAR1], AX 
     mov AX, [2 + offset var2]
-    adc [2 + offset VAR1], AX  
-    JC overflow ;neu CF = 1, thi overflow
+    sbb [2 + offset VAR1], AX  
+    
 ;======================================================== 
     ;IN RA KI TU XUONG DONG
     MOV AH, 2
     MOV DL, 0AH ;NEW LINE CHARATER
     INT 21H
     MOV DL, 13 ;DUA CON TRO VE DAU HANG
-    INT 21H                               
-
+    INT 21H 
+    ;in ra dau tru neu kq am
+    JNC KhongInDauTru     
+    MOV DL, '-'
+    INT 21H                                
+    
+    ;var1 < 0, lay 0 - var1 de lay gia tri tuyet doi
+    CLC
+    mov AX, 0                 
+    MOV BX, OFFSET VAR1
+    sub AX, [BX + 0] 
+    mov DX, 0
+    sbb DX, [BX + 2]
+    MOV [0 + offset VAR1], AX 
+    MOV [2 + offset VAR1], DX 
+    KhongInDauTru: 
+       
 ;========================================================    
     ;CHUYEN DOI SO NHI PHAN SANG STRING  
     MOV CX, 10  
